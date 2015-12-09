@@ -11,58 +11,51 @@
   </style>
   <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
   <link rel="import" href="bower_components/vaadin-grid/vaadin-grid.html">
-  <link rel="import" href="bower_components/paper-button/paper-button.html">
-  <link rel="import" href="bower_components/paper-input/paper-input.html">
-  <link rel="import" href="bower_components/iron-flex-layout/classes/iron-flex-layout.html">
 </head>
 
 <body>
-  <template is="dom-bind" id="app">
-    <h1>Vaadin Elementary School Signups</h1>
-
-    <div class="layout horizontal justified">
-      <paper-input value="{{newSignup.first}}" label="First"></paper-input>
-      <paper-input value="{{newSignup.last}}" label="Last"></paper-input>
-      <paper-input value="{{newSignup.email}}" label="Email"></paper-input>
-      <paper-input value="{{newSignup.phone}}" label="Phone"></paper-input>
-      <paper-button raised on-tap="signUp" class="self-center">Sign up</paper-button>
-    </div>
-    <vaadin-grid>
-      <table>
-        <colgroup>
-          <col name="first" />
-          <col name="last" />
-          <col name="email" />
-          <col name="phone" />
-        </colgroup>
-      </table>
-    </vaadin-grid>
-  </template>
+  <h1>Vaadin Elementary School Signups</h1>
+  <vaadin-grid>
+    <table>
+      <colgroup>
+        <col name="user.name.first" />
+        <col name="user.name.last" />
+        <col name="user.email" />
+        <col name="user.phone" />
+      </colgroup>
+    </table>
+  </vaadin-grid>
   <script type="text/javascript">
-    var signups = [{
-      first: 'Marcus',
-      last: 'Hellberg',
-      email: 'marcus@email.com',
-      phone: '123-123-1234'
-    }, {
-      first: 'Joonas',
-      last: 'Lehtinen',
-      email: 'joonas@email.com',
-      phone: '321-321-4321'
-    }];
-
     window.addEventListener('WebComponentsReady', function() {
       var grid = document.querySelector('vaadin-grid');
-      grid.items = signups;
 
-      var app = document.querySelector('#app');
-      app.newSignup = {};
-
-      app.signUp = function() {
-        signups.push(app.newSignup);
-        grid.size = signups.length;
-        app.newSignup = {};
+      var datasource = function(params, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+              var json = JSON.parse(xhr.responseText);
+              callback(json);
+            }
+          }
+        };
+        xhr.open('GET', 'http://localhost:8080/signups?index=' + params.index + '&count=' + params.count, true);
+        xhr.send();
       };
+
+      var xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            var json = JSON.parse(xhr.responseText);
+            grid.size = json.count;
+            grid.items = datasource;
+          }
+        }
+      };
+      xhr.open('GET', 'http://localhost:8080/signups/count', true);
+      xhr.send();
+
     });
   </script>
 </body>
