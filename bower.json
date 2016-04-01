@@ -1,5 +1,5 @@
 {
-  "name": "datasources",
+  "name": "elementary-school-006",
   "description": "",
   "main": "index.js",
   "authors": [
@@ -16,5 +16,8 @@
     "test",
     "tests"
   ],
-  "dependencies": {}
+  "dependencies": {
+    "vaadin-grid": "^1.0.0",
+    "iron-ajax": "PolymerElements/iron-ajax#^1.1.1"
+  }
 }

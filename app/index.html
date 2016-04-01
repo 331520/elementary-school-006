@@ -1,63 +1,45 @@
 <!DOCTYPE html>
 <html>
 
-<head>
-  <meta charset="utf-8">
-  <title>Vaadin Elementary School</title>
-  <style>
-    body {
-      font-family: 'Helvetica Neue', Helvetica, sans-serif;
-    }
-  </style>
-  <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
-  <link rel="import" href="bower_components/vaadin-grid/vaadin-grid.html">
-</head>
+  <head>
+    <meta charset="utf-8">
+    <title>Vaadin Elementary School</title>
+    <style>
+      body {
+        font-family: 'Helvetica Neue', Helvetica, sans-serif;
+      }
 
-<body>
-  <h1>Vaadin Elementary School Signups</h1>
-  <vaadin-grid>
-    <table>
-      <colgroup>
-        <col name="user.name.first" />
-        <col name="user.name.last" />
-        <col name="user.email" />
-        <col name="user.phone" />
-      </colgroup>
-    </table>
-  </vaadin-grid>
-  <script type="text/javascript">
-    window.addEventListener('WebComponentsReady', function() {
-      var grid = document.querySelector('vaadin-grid');
+    </style>
+    <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <link rel="import" href="bower_components/iron-ajax/iron-ajax.html">
+    <link rel="import" href="bower_components/vaadin-grid/vaadin-grid.html">
+  </head>
 
-      var datasource = function(params, callback) {
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function() {
-          if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-              var json = JSON.parse(xhr.responseText);
-              callback(json);
-            }
-          }
+  <body>
+    <template is="dom-bind">
+      <h1>Vaadin Elementary School Signups</h1>
+      <iron-ajax auto url="http://demo.vaadin.com/demo-data/1.0/people" handle-as="json" last-response="{{peopleResponse}}"></iron-ajax>
+      <vaadin-grid items="{{peopleResponse.result}}">
+        <table>
+          <colgroup>
+            <col name="firstName"/>
+            <col name="lastName"/>
+            <col name="email"/>
+            <col name="address.phone"/>
+          </colgroup>
+        </table>
+      </vaadin-grid>
+    </template>
+    <script type="text/javascript">
+
+      window.addEventListener('WebComponentsReady', function () {
+        var grid = document.querySelector('vaadin-grid');
+
+        grid.columns[2].renderer = function (cell) {
+          cell.element.innerHTML = '<a href="mailto:' + cell.data + '">' + cell.data + '</a>';
         };
-        xhr.open('GET', 'http://localhost:8080/signups?index=' + params.index + '&count=' + params.count, true);
-        xhr.send();
-      };
-
-      var xhr = new XMLHttpRequest();
-      xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4) {
-          if (xhr.status === 200) {
-            var json = JSON.parse(xhr.responseText);
-            grid.size = json.count;
-            grid.items = datasource;
-          }
-        }
-      };
-      xhr.open('GET', 'http://localhost:8080/signups/count', true);
-      xhr.send();
-
-    });
-  </script>
-</body>
+      });
+    </script>
+  </body>
 
 </html>
